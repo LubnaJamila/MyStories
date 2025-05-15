@@ -1,13 +1,13 @@
 const CACHE_NAME = 'storyapp-v1';
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/favicon.png',
-  '/app.bundle.js',
-  '/app.css',
-  '/manifest.json',
-  '/icon-192.png',
-  '/icon-512.png',
+  './',
+  './index.html',
+  './favicon.png',
+  './app.bundle.js',
+  './app.css',
+  './manifest.json',
+  './icon-192.png',
+  './icon-512.png',
 ];
 
 
@@ -45,7 +45,7 @@ self.addEventListener('fetch', (event) => {
 
   if (event.request.mode === 'navigate') {
     event.respondWith(
-      fetch(event.request).catch(() => caches.match('/index.html'))
+      fetch(event.request).catch(() => caches.match('./index.html'))
     );
     return;
   }

@@ -1,18 +1,35 @@
 {
   "name": "Story App",
   "short_name": "StoryApp",
-  "start_url": "/",
+  "description": "Aplikasi berbagi cerita pengguna",
+  "id": "/MyStories/",
+  "start_url": "/MyStories/#/login",
+  "scope":"/MyStories/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#6200ea",
+  "screenshots": [
+    {
+      "src": "screenshots/desktop.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide"
+    },
+    {
+      "src": "screenshots/mobile1.png",
+      "sizes": "360x640",
+      "type": "image/png",
+      "form_factor": "narrow"
+    }
+  ],
   "icons": [
     {
-      "src": "/icon-192.png",
+      "src": "icon-192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "/icon-512.png",
+      "src": "icon-512.png",
       "sizes": "512x512",
       "type": "image/png"
     }
