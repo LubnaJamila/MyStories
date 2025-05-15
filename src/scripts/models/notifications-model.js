@@ -2,7 +2,7 @@ import CONFIG from "../config";
 
 class NotificationModel {
   constructor() {
-    this.isSubscribed = false; 
+    this.isSubscribed = this.checkLocalSubscriptionStatus();
   }
 
   async subscribe() {
@@ -55,7 +55,8 @@ class NotificationModel {
             );
           }
 
-          this.isSubscribed = true; 
+          this.isSubscribed = true;
+          this.setLocalSubscriptionStatus(true);
           console.log("📬 Berhasil subscribe push notification");
         } else {
           console.log("Izin push notification ditolak");
@@ -93,7 +94,8 @@ class NotificationModel {
             if (!response.ok) throw new Error("Gagal unsubscribe dari server");
 
             await subscription.unsubscribe();
-            this.isSubscribed = false; 
+            this.isSubscribed = false;
+            this.setLocalSubscriptionStatus(false);
             console.log("🛑 Berhasil unsubscribe push notification");
           }
         }
@@ -133,6 +135,14 @@ class NotificationModel {
       binary += String.fromCharCode(bytes[i]);
     }
     return window.btoa(binary);
+  }
+
+  checkLocalSubscriptionStatus() {
+    return localStorage.getItem("isSubscribed") === "true";
+  }
+
+  setLocalSubscriptionStatus(status) {
+    localStorage.setItem("isSubscribed", status ? "true" : "false");
   }
 }
 

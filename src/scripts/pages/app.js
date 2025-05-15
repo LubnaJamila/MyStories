@@ -44,12 +44,8 @@ class App {
   async renderPage() {
     const url = getActiveRoute();
     const pathname = getActivePathname();
-
-    // Cek apakah route ada di routes kita
     let page = routes[url];
 
-    // Jika halaman tidak ditemukan, gunakan halaman Not Found
-    // Ini harus dicek terlebih dahulu sebelum pengecekan autentikasi
     if (!page) {
       console.log(`Page not found for route: ${pathname}`);
       page = routes["*"];
@@ -57,7 +53,6 @@ class App {
       return;
     }
 
-    // Cek otentikasi untuk halaman yang memerlukan login
     if (
       !AuthUtils.isLoggedIn() &&
       url !== "/login" &&
@@ -100,12 +95,10 @@ class App {
         userNameItem.textContent = `Halo, ${auth.name}`;
 
         const button = document.createElement("button");
-        button.textContent = this.#notificationModel.checkSubscriptionStatus()
-          ? "Nonaktifkan"
-          : "Aktifkan";
-        button.classList.add("notification-btn");
-        let isActive = this.#notificationModel.checkSubscriptionStatus();
+        let isActive = this.#notificationModel.checkLocalSubscriptionStatus();
 
+        button.textContent = isActive ? "Nonaktifkan" : "Aktifkan";
+        button.classList.add("notification-btn");
         button.classList.add(isActive ? "active" : "inactive");
 
         button.addEventListener("click", async () => {
@@ -124,6 +117,8 @@ class App {
             console.log("Fitur dinonaktifkan!");
             await this.#notificationModel.unsubscribe();
           }
+
+          this.#notificationModel.setLocalSubscriptionStatus(isActive);
         });
 
         userNameItem.appendChild(button);
