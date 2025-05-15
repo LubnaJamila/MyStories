@@ -10,8 +10,8 @@
   "theme_color": "#6200ea",
   "screenshots": [
     {
-      "src": "screenshots/desktop.png",
-      "sizes": "1280x720",
+      "src": "screenshots/desktop1.png",
+      "sizes": "1366x643",
       "type": "image/png",
       "form_factor": "wide"
     },
