@@ -1,34 +1,41 @@
 function extractPathnameSegments(path) {
-  const splitUrl = path.split('/');
+  const splitUrl = path.split("/");
 
   return {
     resource: splitUrl[1] || null,
     id: splitUrl[2] || null,
+    isUnknown: false,
   };
 }
 
 function constructRouteFromSegments(pathSegments) {
-  let pathname = '';
+  if (pathSegments.isUnknown) {
+    return "*";
+  }
+
+  let pathname = "";
 
   if (pathSegments.resource) {
     pathname = pathname.concat(`/${pathSegments.resource}`);
   }
 
   if (pathSegments.id) {
-    pathname = pathname.concat('/:id');
+    pathname = pathname.concat("/:id");
   }
 
-  return pathname || '/';
+  return pathname || "/";
 }
 
 export function getActivePathname() {
-  return location.hash.replace('#', '') || '/';
+  return location.hash.replace("#", "") || "/";
 }
 
 export function getActiveRoute() {
   const pathname = getActivePathname();
   const urlSegments = extractPathnameSegments(pathname);
-  return constructRouteFromSegments(urlSegments);
+  const constructedRoute = constructRouteFromSegments(urlSegments);
+
+  return constructedRoute;
 }
 
 export function parseActivePathname() {

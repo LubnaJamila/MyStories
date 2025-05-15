@@ -1,6 +1,6 @@
-import NotificationModel from "../models/notifications-model"; 
+import NotificationModel from "../models/notifications-model";
 import AuthUtils from "../utils/auth-utils";
-import { getActiveRoute } from "../routes/url-parser";
+import { getActiveRoute, getActivePathname } from "../routes/url-parser";
 import routes from "../routes/routes";
 
 class App {
@@ -8,7 +8,7 @@ class App {
   #drawerButton = null;
   #navigationDrawer = null;
   #navList = null;
-  #notificationModel = null; 
+  #notificationModel = null;
 
   constructor({ navigationDrawer, drawerButton, content, navList }) {
     this.#content = content;
@@ -16,7 +16,7 @@ class App {
     this.#navigationDrawer = navigationDrawer;
     this.#navList = navList;
 
-    this.#notificationModel = new NotificationModel(); 
+    this.#notificationModel = new NotificationModel();
     this._setupDrawer();
   }
 
@@ -43,19 +43,32 @@ class App {
 
   async renderPage() {
     const url = getActiveRoute();
-    const page = routes[url];
+    const pathname = getActivePathname();
 
+    // Cek apakah route ada di routes kita
+    let page = routes[url];
+
+    // Jika halaman tidak ditemukan, gunakan halaman Not Found
+    // Ini harus dicek terlebih dahulu sebelum pengecekan autentikasi
     if (!page) {
-      window.location.href = AuthUtils.isLoggedIn() ? "#/" : "#/login";
+      console.log(`Page not found for route: ${pathname}`);
+      page = routes["*"];
+      this._renderNotFoundPage(page);
+      return;
+    }
+
+    // Cek otentikasi untuk halaman yang memerlukan login
+    if (
+      !AuthUtils.isLoggedIn() &&
+      url !== "/login" &&
+      url !== "/register" &&
+      url !== "*"
+    ) {
+      window.location.href = "#/login";
       return;
     }
 
     this._updateNavigationItems();
-
-    if (!AuthUtils.isLoggedIn() && url !== "/login" && url !== "/register") {
-      window.location.href = "#/login";
-      return;
-    }
 
     if ("startViewTransition" in document) {
       const transition = document.startViewTransition(async () => {
@@ -91,7 +104,7 @@ class App {
           ? "Nonaktifkan"
           : "Aktifkan";
         button.classList.add("notification-btn");
-        let isActive = this.#notificationModel.checkSubscriptionStatus(); 
+        let isActive = this.#notificationModel.checkSubscriptionStatus();
 
         button.classList.add(isActive ? "active" : "inactive");
 
@@ -99,17 +112,17 @@ class App {
           isActive = !isActive;
 
           if (isActive) {
-            button.textContent = "Nonaktifkan"; 
+            button.textContent = "Nonaktifkan";
             button.classList.remove("inactive");
             button.classList.add("active");
             console.log("Fitur diaktifkan!");
-            await this.#notificationModel.subscribe(); 
+            await this.#notificationModel.subscribe();
           } else {
-            button.textContent = "Aktifkan"; 
+            button.textContent = "Aktifkan";
             button.classList.remove("active");
-            button.classList.add("inactive"); 
+            button.classList.add("inactive");
             console.log("Fitur dinonaktifkan!");
-            await this.#notificationModel.unsubscribe(); 
+            await this.#notificationModel.unsubscribe();
           }
         });
 
@@ -125,7 +138,8 @@ class App {
         this.#navList.appendChild(aboutItem);
 
         const offlineStoryItem = document.createElement("li");
-        offlineStoryItem.innerHTML = '<a href="#/cerita-offline">Cerita Offline</a>';
+        offlineStoryItem.innerHTML =
+          '<a href="#/cerita-offline">Cerita Offline</a>';
         this.#navList.appendChild(offlineStoryItem);
 
         const logoutItem = document.createElement("li");
@@ -148,6 +162,26 @@ class App {
         registerItem.innerHTML = '<a href="#/register">Register</a>';
         this.#navList.appendChild(registerItem);
       }
+    }
+  }
+
+  async _renderNotFoundPage(page) {
+    this._updateNavigationItems();
+
+    if ("startViewTransition" in document) {
+      const transition = document.startViewTransition(async () => {
+        this.#content.innerHTML = await page.render();
+        await page.afterRender();
+      });
+
+      await transition.finished;
+    } else {
+      this.#content.classList.remove("visible");
+      this.#content.innerHTML = await page.render();
+      await page.afterRender();
+      setTimeout(() => {
+        this.#content.classList.add("visible");
+      }, 50);
     }
   }
 }
