@@ -34,7 +34,7 @@ class AddStoryPresenter {
         alert(`Gagal: ${result.message}`);
       } else {
         alert("Story berhasil ditambahkan!");
-        window.location.href = "/#";
+        window.location.hash = "/";
       }
     } catch (error) {
       alert("Terjadi kesalahan saat mengirim story.");
