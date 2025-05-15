@@ -1,0 +1,1 @@
+Menggunakan OpenStreetMap tanpa API key
